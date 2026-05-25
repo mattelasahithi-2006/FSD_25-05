@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        *{box-sizing: border-box}
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display:flex;align-items:center;justify-content:center;min-height:100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin:0;padding:0;color:#333;
+        }
+        .card{background: #fff;padding:30px;border-radius:10px;max-width:420px;width:100%;box-shadow:0 10px 25px rgba(0,0,0,0.2)}
+        h1{margin:0 0 18px 0;font-size:24px}
+        .form-group{margin-bottom:14px}
+        label{display:block;margin-bottom:6px;font-weight:600}
+        input{width:100%;padding:10px;border:2px solid #ddd;border-radius:6px;font-size:15px}
+        input.error{border-color:#e74c3c}
+        .error-message{color:#e74c3c;font-size:13px;margin-top:6px;display:none}
+        .error-message.show{display:block}
+        button{width:100%;padding:12px;border:none;background:#667eea;color:#fff;border-radius:6px;font-weight:700;cursor:pointer}
+        .link{margin-top:12px;text-align:center}
+        .success{color:#27ae60;text-align:center;margin-top:10px;display:none}
+        .success.show{display:block}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Create an account</h1>
+        <form id="registerForm" novalidate>
+            <div class="form-group">
+                <label for="username">Full Name</label>
+                <input id="username" name="username" type="text" placeholder="Your name" required>
+                <div class="error-message" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="regEmail">Email</label>
+                <input id="regEmail" name="email" type="email" placeholder="you@example.com" required>
+                <div class="error-message" id="regEmailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input id="regPassword" name="password" type="password" placeholder="Create a password" required>
+                <div class="error-message" id="regPasswordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" name="confirm" type="password" placeholder="Confirm password" required>
+                <div class="error-message" id="confirmError"></div>
+            </div>
+
+            <button type="submit">Register</button>
+            <div class="success" id="successMsg">Registration successful. Redirecting...</div>
+            <div class="link">Already have an account? <a href="login.html">Login</a></div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('regEmail');
+        const passwordInput = document.getElementById('regPassword');
+        const confirmInput = document.getElementById('confirmPassword');
+
+        const usernameError = document.getElementById('usernameError');
+        const emailError = document.getElementById('regEmailError');
+        const passwordError = document.getElementById('regPasswordError');
+        const confirmError = document.getElementById('confirmError');
+        const successMsg = document.getElementById('successMsg');
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        function showError(input, el, msg){input.classList.add('error');el.textContent=msg;el.classList.add('show')}
+        function clearError(input, el){input.classList.remove('error');el.textContent='';el.classList.remove('show')}
+
+        // Prefill email if provided in query
+        (function prefill(){
+            const params = new URLSearchParams(window.location.search);
+            const e = params.get('email');
+            if(e){ emailInput.value = decodeURIComponent(e); }
+        })();
+
+        form.addEventListener('submit', (ev)=>{
+            ev.preventDefault();
+            let ok = true;
+            const name = usernameInput.value.trim();
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if(!name){ showError(usernameInput, usernameError, 'Name is required'); ok=false } else clearError(usernameInput, usernameError);
+
+            if(!email){ showError(emailInput, emailError, 'Email is required'); ok=false }
+            else if(!emailRegex.test(email)){ showError(emailInput, emailError, 'Enter a valid email'); ok=false }
+            else clearError(emailInput, emailError);
+
+            if(!password){ showError(passwordInput, passwordError, 'Password is required'); ok=false }
+            else if(password.length < 6){ showError(passwordInput, passwordError, 'Password must be at least 6 characters'); ok=false }
+            else clearError(passwordInput, passwordError);
+
+            if(confirm !== password){ showError(confirmInput, confirmError, 'Passwords do not match'); ok=false } else clearError(confirmInput, confirmError);
+
+            if(!ok) return;
+
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if(users[email]){
+                showError(emailInput, emailError, 'An account with this email already exists');
+                return;
+            }
+
+            users[email] = { username: name, password };
+            localStorage.setItem('users', JSON.stringify(users));
+
+            successMsg.classList.add('show');
+
+            // Auto-login and redirect to welcome
+            const uname = encodeURIComponent(name);
+            console.log('Registered user:', { email, username: name });
+            setTimeout(()=>{
+                window.location.href = `a.html?user=${uname}`;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
