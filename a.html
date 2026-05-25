@@ -3,9 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .welcome-card {
+            background: rgba(255,255,255,0.06);
+            padding: 30px 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        p { opacity: 0.9; }
+    </style>
 </head>
 <body>
-    <h1>hello world</h1>
+    <div class="welcome-card">
+        <h1 id="greeting">Hello!</h1>
+        <p id="sub">Welcome to the site.</p>
+    </div>
+
+    <script>
+        // Read 'user' query parameter and show a personalized greeting
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        const rawUser = getQueryParam('user');
+        const greetingEl = document.getElementById('greeting');
+        const subEl = document.getElementById('sub');
+
+        if (rawUser) {
+            const username = decodeURIComponent(rawUser).replace(/[^\w\-\. ]/g, '');
+            greetingEl.textContent = `Hello, ${username}!`;
+            subEl.textContent = 'You have successfully logged in.';
+            console.log('Logged in user:', username);
+        } else {
+            greetingEl.textContent = 'Hello!';
+            subEl.textContent = 'No user information provided.';
+        }
+    </script>
 </body>
 </html>

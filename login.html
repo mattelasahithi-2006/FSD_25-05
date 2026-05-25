@@ -251,21 +251,44 @@
                 clearError(passwordInput, passwordError);
             }
 
-            // If valid, show success message
+            // If valid, proceed to authentication check
             if (isValid) {
+                const email = emailInput.value.trim().toLowerCase();
+                const password = passwordInput.value;
+
+                // Load users from localStorage (email -> { username, password })
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+                // If user not found, redirect to registration page with email prefilled
+                if (!users[email]) {
+                    successMessage.textContent = 'User not found. Redirecting to registration...';
+                    successMessage.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = `register.html?email=${encodeURIComponent(email)}`;
+                    }, 1000);
+                    return;
+                }
+
+                // If password mismatch, show error
+                if (users[email].password !== password) {
+                    showError(passwordInput, passwordError, 'Incorrect password');
+                    return;
+                }
+
+                // Successful login
+                successMessage.textContent = 'Login successful! Redirecting...';
                 successMessage.classList.add('show');
                 form.style.opacity = '0.6';
                 form.style.pointerEvents = 'none';
 
-                // Print credentials to console
-                console.log('Email:', emailInput.value);
-                console.log('Password:', passwordInput.value);
+                // Print credentials to console for debugging
+                console.log('Email:', email);
+                console.log('Password:', password);
 
-                // Redirect to a.html after 2 seconds
+                const username = encodeURIComponent(users[email].username || email.split('@')[0]);
                 setTimeout(() => {
-                    const email = encodeURIComponent(emailInput.value);
-                    window.location.href = `a.html?email=${email}`;
-                }, 2000);
+                    window.location.href = `a.html?user=${username}`;
+                }, 1000);
             }
         });
     </script>
