@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            color: #27ae60;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form id="loginForm" novalidate>
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email"
+                    required
+                >
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit">Login</button>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                Login successful! Redirecting...
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const successMessage = document.getElementById('successMessage');
+
+        // Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Validate email
+        function validateEmail(email) {
+            if (!email.trim()) {
+                return { valid: false, message: 'Email is required' };
+            }
+            if (!emailRegex.test(email)) {
+                return { valid: false, message: 'Please enter a valid email address' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        // Validate password
+        function validatePassword(password) {
+            if (!password) {
+                return { valid: false, message: 'Password is required' };
+            }
+            if (password.length < 6) {
+                return { valid: false, message: 'Password must be at least 6 characters' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        // Show error message
+        function showError(input, errorElement, message) {
+            input.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        // Clear error message
+        function clearError(input, errorElement) {
+            input.classList.remove('error');
+            errorElement.textContent = '';
+            errorElement.classList.remove('show');
+        }
+
+        // Real-time email validation
+        emailInput.addEventListener('blur', () => {
+            const validation = validateEmail(emailInput.value);
+            if (!validation.valid) {
+                showError(emailInput, emailError, validation.message);
+            } else {
+                clearError(emailInput, emailError);
+            }
+        });
+
+        emailInput.addEventListener('focus', () => {
+            clearError(emailInput, emailError);
+        });
+
+        // Real-time password validation
+        passwordInput.addEventListener('blur', () => {
+            const validation = validatePassword(passwordInput.value);
+            if (!validation.valid) {
+                showError(passwordInput, passwordError, validation.message);
+            } else {
+                clearError(passwordInput, passwordError);
+            }
+        });
+
+        passwordInput.addEventListener('focus', () => {
+            clearError(passwordInput, passwordError);
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Validate all fields
+            const emailValidation = validateEmail(emailInput.value);
+            const passwordValidation = validatePassword(passwordInput.value);
+
+            let isValid = true;
+
+            if (!emailValidation.valid) {
+                showError(emailInput, emailError, emailValidation.message);
+                isValid = false;
+            } else {
+                clearError(emailInput, emailError);
+            }
+
+            if (!passwordValidation.valid) {
+                showError(passwordInput, passwordError, passwordValidation.message);
+                isValid = false;
+            } else {
+                clearError(passwordInput, passwordError);
+            }
+
+            // If valid, show success message
+            if (isValid) {
+                successMessage.classList.add('show');
+                form.style.opacity = '0.6';
+                form.style.pointerEvents = 'none';
+
+                // Print credentials to console
+                console.log('Email:', emailInput.value);
+                console.log('Password:', passwordInput.value);
+
+                // Redirect to a.html after 2 seconds
+                setTimeout(() => {
+                    const email = encodeURIComponent(emailInput.value);
+                    window.location.href = `a.html?email=${email}`;
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
